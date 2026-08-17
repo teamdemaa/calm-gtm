@@ -41,7 +41,11 @@ fi
 install_into() {
   target_dir="$1"
   label="$2"
-  if [ -d "$(dirname "$target_dir")" ]; then
+  # Check for the tool's own base directory (e.g. ~/.claude), not the
+  # skills subfolder itself -- the subfolder often doesn't exist yet even
+  # on a machine that has the tool installed, and mkdir -p creates it fine.
+  tool_home="$(dirname "$(dirname "$target_dir")")"
+  if [ -d "$tool_home" ]; then
     mkdir -p "$target_dir"
     cp -R "$SRC_DIR/SKILL.md" "$SRC_DIR/references" "$target_dir/"
     echo "Installed for $label -> $target_dir"
