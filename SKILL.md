@@ -61,10 +61,10 @@ new engagement. Open with:
 > pricing, what you've tried, what seems to work, what feels unclear, and
 > what you want this company to become.
 >
-> If you have a website, a LinkedIn (personal or company page), a pitch
-> deck, past customer interviews, analytics, or anything else that shows
-> rather than tells — drop the links or files in. I'll pull real detail
-> from them instead of asking you to retype it.
+> Also send me your website and your LinkedIn (yours and/or the company
+> page), if you have them — plus a pitch deck, past customer interviews,
+> analytics, or anything else that shows rather than tells. I'll pull real
+> detail from them instead of asking you to retype it.
 >
 > Write naturally. The more context you give me, the less I'll need to ask.
 
@@ -92,6 +92,11 @@ treat the link as decoration:
 - Never invent a fact you couldn't find on a fetched page. If the site
   doesn't mention pricing, pricing is still "not yet validated" — a
   polished website is not evidence of a validated offer.
+- Log every link or material the founder gives you in `.calm/sources.md`
+  (create it if it doesn't exist; append, never delete prior entries): the
+  URL or file name, the date, and one line on what you pulled from it. This
+  is what lets a future session know what's already been read, instead of
+  asking the founder to resend the same links.
 
 After reading everything supplied, do three things before writing the full
 strategy:
@@ -116,8 +121,9 @@ Keep this short. It's a checkpoint, not a report.
 ## Returning to an existing project
 
 If `.calm/strategy.md` already exists, this is a continuation, not a fresh
-start. Read `.calm/strategy.md`, `.calm/action-plan.md`, and the most recent
-entries in `.calm/weekly.md` before responding to anything. Figure out from
+start. Read `.calm/strategy.md`, `.calm/action-plan.md`, `.calm/sources.md`,
+and the most recent entries in `.calm/weekly.md` before responding to
+anything. Figure out from
 the founder's message which of the four outputs they're asking for (a
 strategy revision, the next planning cycle, an asset, or a weekly check-in)
 and go straight to the matching reference file. Don't re-ask onboarding
@@ -125,24 +131,27 @@ questions you already have answered in `.calm/`.
 
 If the founder brings a *new* link or material mid-project (a new landing
 page draft, updated LinkedIn, a competitor's site), fetch and read it the
-same way as in first interaction, and treat it as new evidence — it may
-belong in a weekly update's "what we learned" rather than triggering a full
-re-strategy.
+same way as in first interaction, log it in `.calm/sources.md`, and treat
+it as new evidence — it may belong in a weekly update's "what we learned"
+rather than triggering a full re-strategy.
 
 ## Project files
 
-Keep everything in a `.calm/` folder at the project root, plain markdown,
-no database and no external account required:
+Keep everything in a `.calm/` folder at the project root, plain local
+files (markdown plus a few CSV trackers), no database and no external
+account required:
 
 ```
 .calm/
   strategy.md       — current APOP strategy (single source of truth)
+  strategy.csv      — append-only history of the 12 checklist answers, one block of 12 rows per revision
   action-plan.md    — current action plan (Now / Next / Later)
   action-plan.csv   — the same actions, as a plain tracker
   weekly.md         — append-only log, most recent update at the top, including any strategy changes
   weekly.csv        — append-only log of weekly entries, one row per week
   sources.md        — links and materials the founder has supplied (website, LinkedIn, decks...), so future sessions know what's already been read
   assets/           — generated deliverables, one file per asset
+  assets.csv        — append-only index of every asset (name, category, status), not the content itself
 ```
 
 When you update the strategy or plan, don't silently overwrite history.
@@ -164,7 +173,8 @@ Don't build or suggest building: a dashboard, authentication, payments, a
 CRM, a Google Sheets/Notion integration, automated prospect enrichment, or
 market monitoring. If a founder asks for one of these, explain that V1 of
 Calm is deliberately scoped to strategy, planning, assets, and the weekly
-rhythm — plain markdown files, nothing else — and that this is what proves
+rhythm — plain local files (markdown plus a few CSV trackers), nothing
+that needs an account or an API key — and that this is what proves
 whether the GTM judgment itself is good enough to be worth automating
 further.
 

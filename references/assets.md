@@ -8,6 +8,18 @@ Save each asset as its own file under `.calm/assets/` (e.g.
 `.calm/assets/outreach-message-v1.md`), so it can be referenced, reused, and
 revised independently.
 
+Also add one row to `.calm/assets.csv` (create it with the header row below
+if it doesn't exist yet; never delete prior rows) as a plain index of what
+exists, not the content itself. Use exactly this header row, in this order,
+every time — never rename, reorder, add, or remove columns:
+
+```
+Asset Name,Category,Purpose,Linked Action,File,Status
+```
+
+`Status` is `Draft` or `Final`. This is how a founder sees, at a glance,
+everything that's been produced without opening every file.
+
 Every asset must inherit the currently agreed ICP, positioning, offer, GTM
 motion, and tone from `.calm/strategy.md` — don't reinvent messaging
 per-asset. If the material the founder supplied (website copy, LinkedIn

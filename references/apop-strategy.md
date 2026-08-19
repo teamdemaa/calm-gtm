@@ -13,6 +13,21 @@ Write the strategy to `.calm/strategy.md`, replacing the previous version if
 one exists (the *history* of what changed lives in `.calm/weekly.md`'s
 "Strategy changes" notes, not in multiple copies of the strategy file).
 
+Also append 12 rows to `.calm/strategy.csv` (create it with the header row
+below if it doesn't exist yet) — one row per question in the extraction
+checklist below, every time you write or revise the strategy. Unlike
+`strategy.md`, this file is append-only: never delete or overwrite prior
+rows, so the founder can filter by period and see how each answer evolved.
+Use exactly this header row, in this order, every time — never rename,
+reorder, add, or remove columns:
+
+```
+Period,Area,Question,Answer
+```
+
+`Period` is the date of this version of the strategy. `Question` must match
+the checklist question verbatim, word for word — never paraphrase it.
+
 ## Internal extraction checklist
 
 These are the exact questions you're trying to answer for each APOP area,
@@ -23,24 +38,24 @@ still unanswered, in natural conversation. Keep these three per area fixed;
 don't swap them for different questions.
 
 **Alignment**
-1. What kind of company does the founder actually want to build (lifestyle vs. venture scale)?
-2. What is the founder (or team) genuinely good at, backed by evidence?
-3. What should the founder keep doing personally vs. hand off?
+1. What do you want this company to bring you?
+2. What are you particularly good at, and how do you know?
+3. What constraints are you working with right now: time, money, energy?
 
 **Positioning**
-1. Who is the smallest useful starting customer group?
-2. What important problem, in the customer's own words, are we solving?
-3. What does the customer do today instead (the real alternative)?
+1. Who do you want to serve as a priority?
+2. What important problem are you solving for them?
+3. What does the customer do today instead, and what makes your way of solving it different?
 
 **Offer**
-1. What concrete outcome is the customer actually buying?
-2. What is the current pricing model or hypothesis, and is it validated?
-3. What proof would make this offer meaningfully more credible?
+1. What concrete outcome is the customer coming for?
+2. What exactly does the offer include?
+3. What's the price, how is it billed, and is it validated or still a hypothesis?
 
 **Promotion**
-1. What is the one primary GTM motion that fits this business right now?
-2. Why does this motion fit the ICP, the buying behavior, and the current stage?
-3. What is the realistic path from discovery to purchase?
+1. How do the right customers discover you?
+2. What helps them move to purchase?
+3. How do you nurture the relationship to encourage repeat purchase and referral?
 
 ## Output format
 
