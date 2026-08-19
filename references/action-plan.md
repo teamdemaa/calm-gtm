@@ -5,8 +5,8 @@ Only build this once the founder has explicitly agreed to the strategy in
 strategy's APOP — see the action-plan rule in the main SKILL.md.
 
 Write the plan to `.calm/action-plan.md`, replacing the previous version
-(history lives in `.calm/decisions.md` and in `.calm/weekly.md`'s
-priorities-over-time, not in multiple copies of this file).
+(history lives in `.calm/weekly.md` — both its "Strategy changes" notes
+and its priorities-over-time — not in multiple copies of this file).
 
 Also write `.calm/action-plan.csv`, replacing the previous version, as a
 plain tracker of the same actions. Use exactly this header row, in this
@@ -42,27 +42,25 @@ One short sentence tying it back to the GTM thesis.
 ### Actions
 ```
 
-For each action, use exactly these fields:
+List actions as a table, one row per action, using exactly these columns,
+in this order, same as `.calm/action-plan.csv`:
 
 ```markdown
-**Action:** What exactly needs to happen.
-**Why:** Why it matters to the GTM thesis.
-**Responsible:** Founder / cofounder / marketing / sales / product / named person.
-**Due:** Specific date or week.
-**Deliverable:** The tangible output.
-**Success signal:** What would indicate real progress or a useful learning.
-**Status:** Not started / In progress / Done / Blocked.
+| Action | Why | Responsible | Due | Deliverable | Success Signal | Status |
+|---|---|---|---|---|---|---|
 ```
 
-Example:
+- **Action:** What exactly needs to happen.
+- **Why:** Why it matters to the GTM thesis.
+- **Responsible:** Founder / cofounder / marketing / sales / product / named person.
+- **Due:** Specific date or week.
+- **Deliverable:** The tangible output.
+- **Success Signal:** What would indicate real progress or a useful learning.
+- **Status:** Not started / In progress / Done / Blocked.
 
-> **Action:** Interview 10 Heads of Product matching the ICP.
-> **Why:** Validate whether the problem is sufficiently painful and urgent.
-> **Responsible:** Founder.
-> **Due:** Week 2.
-> **Deliverable:** 10 completed conversations + notes.
-> **Success signal:** At least 5 independently describe the same problem and 2 show willingness to test or pay.
-> **Status:** Not started.
+Example row:
+
+| Interview 10 Heads of Product matching the ICP | Validate whether the problem is sufficiently painful and urgent | Founder | Week 2 | 10 completed conversations + notes | At least 5 independently describe the same problem and 2 show willingness to test or pay | Not started |
 
 ## The rule
 

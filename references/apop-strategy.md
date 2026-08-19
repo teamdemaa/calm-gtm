@@ -10,8 +10,8 @@ their website/LinkedIn/materials; ask only about what's missing and
 material.
 
 Write the strategy to `.calm/strategy.md`, replacing the previous version if
-one exists (the *history* of what changed lives in `.calm/decisions.md`, not
-in multiple copies of the strategy file).
+one exists (the *history* of what changed lives in `.calm/weekly.md`'s
+"Strategy changes" notes, not in multiple copies of the strategy file).
 
 ## Internal extraction checklist
 
@@ -165,7 +165,8 @@ this conversation.
 
 Never rewrite the whole document from scratch when new evidence comes in.
 Update only the APOP areas the evidence actually justifies, and log the
-change in `.calm/decisions.md` in this form:
+change under "Strategy changes" in `.calm/weekly.md` (see
+`references/weekly-update.md`), in this form:
 
 > **Positioning changed this week.**
 >
@@ -175,3 +176,7 @@ change in `.calm/decisions.md` in this form:
 >
 > Why: 7 of 9 customer conversations reacted more strongly to the second
 > problem.
+
+If the revision happens outside the weekly rhythm, add a new entry to
+`.calm/weekly.md` for it rather than skipping the log — don't create a
+separate decisions file.

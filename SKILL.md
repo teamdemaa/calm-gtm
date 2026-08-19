@@ -136,19 +136,20 @@ no database and no external account required:
 
 ```
 .calm/
-  strategy.md      — current APOP strategy (single source of truth)
-  action-plan.md   — current action plan (Now / Next / Later)
-  weekly.md         — append-only log, most recent update at the top
-  decisions.md      — append-only log of what changed and why (see below)
-  sources.md         — links and materials the founder has supplied (website, LinkedIn, decks...), so future sessions know what's already been read
+  strategy.md       — current APOP strategy (single source of truth)
+  action-plan.md    — current action plan (Now / Next / Later)
+  action-plan.csv   — the same actions, as a plain tracker
+  weekly.md         — append-only log, most recent update at the top, including any strategy changes
+  weekly.csv        — append-only log of weekly entries, one row per week
+  sources.md        — links and materials the founder has supplied (website, LinkedIn, decks...), so future sessions know what's already been read
   assets/           — generated deliverables, one file per asset
 ```
 
 When you update the strategy or plan, don't silently overwrite history.
-Append a short entry to `decisions.md`: what changed, in which APOP area,
-and why (tie it to specific evidence). `weekly.md` and `decisions.md` are
-what let a founder — or you, next week — reconstruct how the thinking
-evolved.
+Log what changed, in which APOP area, and why (tie it to specific
+evidence) under "Strategy changes" in that week's `.calm/weekly.md` entry.
+`weekly.md` is what lets a founder — or you, next week — reconstruct how
+the thinking evolved.
 
 ## The action-plan rule
 

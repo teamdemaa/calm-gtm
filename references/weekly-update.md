@@ -55,6 +55,17 @@ Review each area only as needed — most weeks, most areas don't change:
 **Offer:** No change / change.
 **Promotion:** No change / change.
 
+### Strategy changes
+Only include this section if something above actually changed. For each
+change, in this form:
+
+> **[Area] changed this week.**
+>
+> Previous hypothesis: "..."
+> New hypothesis: "..."
+>
+> Why: [the specific evidence from this week].
+
 ### Keep
 What should continue.
 
@@ -65,11 +76,10 @@ What should be modified.
 What should stop.
 
 ### This week's priorities
-Maximum 3. Each with:
-- **Action:**
-- **Responsible:**
-- **Due:**
-- **Success signal:**
+Maximum 3, as a table:
+
+| Action | Responsible | Due | Success Signal |
+|---|---|---|---|
 
 ### One thing not to do
 One distraction or unnecessary activity to explicitly avoid this week.
@@ -90,10 +100,10 @@ The strategy is not immutable, but it's also not rewritten wholesale every
 week. When evidence justifies a change:
 
 1. Update only the relevant APOP area(s) in `.calm/strategy.md`.
-2. Log what changed and why in `.calm/decisions.md` (see the format in
-   `references/apop-strategy.md`) — tie every change to specific evidence
-   from this week, not vibes.
+2. Log what changed and why under "Strategy changes" in this week's
+   `.calm/weekly.md` entry (see the Output format above) — tie every
+   change to specific evidence from this week, not vibes.
 3. Update `.calm/action-plan.md` if future actions are affected.
 4. Update any assets in `.calm/assets/` that depended on what changed.
-5. Never silently rewrite history — prior decisions and learnings stay
-   visible in `.calm/decisions.md` even after being superseded.
+5. Never silently rewrite history — prior entries in `.calm/weekly.md`
+   stay visible, even after a decision gets superseded later.
