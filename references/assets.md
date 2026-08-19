@@ -30,9 +30,10 @@ offer, follow-up summary.
 campaign hypothesis, audience, keywords, creative angle, ad copy, landing
 page, budget test, conversion event, stop/continue criteria.
 
-**Content or generosity** (only when relevant to the agreed motion) —
-benchmark, useful research, template, calculator, teardown, guide, free
-tool, educational resource.
+**Content or generosity** (only when relevant to the agreed motion) — the
+founder's high-value free asset: benchmark, useful research, template,
+calculator, teardown, guide, free tool, educational resource. Something
+genuinely useful on its own, not a thin excuse to collect an email.
 
 ## Output format
 

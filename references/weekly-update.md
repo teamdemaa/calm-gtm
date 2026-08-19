@@ -75,6 +75,15 @@ Maximum 3. Each with:
 One distraction or unnecessary activity to explicitly avoid this week.
 ```
 
+Also append one row to `.calm/weekly.csv` (create it with the header row
+below if it doesn't exist yet; never delete prior rows). Use exactly this
+header row, in this order, every time — never rename, reorder, add, or
+remove columns:
+
+```
+Date,What Happened,What Matters,What We Learned,Keep,Change,Stop,One Thing Not To Do
+```
+
 ## Updating the engine
 
 The strategy is not immutable, but it's also not rewritten wholesale every

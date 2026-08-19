@@ -13,6 +13,35 @@ Write the strategy to `.calm/strategy.md`, replacing the previous version if
 one exists (the *history* of what changed lives in `.calm/decisions.md`, not
 in multiple copies of the strategy file).
 
+## Internal extraction checklist
+
+These are the exact questions you're trying to answer for each APOP area,
+before you ask the founder anything. They are for your own reasoning, not a
+form to hand the founder verbatim — extract as much as you can from what
+they already told you and whatever you fetched, and only surface the ones
+still unanswered, in natural conversation. Keep these three per area fixed;
+don't swap them for different questions.
+
+**Alignment**
+1. What kind of company does the founder actually want to build (lifestyle vs. venture scale)?
+2. What is the founder (or team) genuinely good at, backed by evidence?
+3. What should the founder keep doing personally vs. hand off?
+
+**Positioning**
+1. Who is the smallest useful starting customer group?
+2. What important problem, in the customer's own words, are we solving?
+3. What does the customer do today instead (the real alternative)?
+
+**Offer**
+1. What concrete outcome is the customer actually buying?
+2. What is the current pricing model or hypothesis, and is it validated?
+3. What proof would make this offer meaningfully more credible?
+
+**Promotion**
+1. What is the one primary GTM motion that fits this business right now?
+2. Why does this motion fit the ICP, the buying behavior, and the current stage?
+3. What is the realistic path from discovery to purchase?
+
 ## Output format
 
 Use this structure every time:

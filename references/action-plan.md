@@ -8,6 +8,18 @@ Write the plan to `.calm/action-plan.md`, replacing the previous version
 (history lives in `.calm/decisions.md` and in `.calm/weekly.md`'s
 priorities-over-time, not in multiple copies of this file).
 
+Also write `.calm/action-plan.csv`, replacing the previous version, as a
+plain tracker of the same actions. Use exactly this header row, in this
+order, every time — never rename, reorder, add, or remove columns:
+
+```
+Horizon,Objective,Action,Why,Responsible,Due,Deliverable,Success Signal,Status
+```
+
+One row per action. `Horizon` is `Now`, `Next`, or `Later`. This file exists
+so the founder can open it in Sheets or Excel — keep the schema identical
+across every regeneration so it stays usable as a running tracker.
+
 Don't produce a sprawling six-month task list. Use three horizons, with
 precision decreasing the further out you go:
 
