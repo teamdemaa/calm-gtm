@@ -19,8 +19,20 @@
 set -e
 
 SKILL_NAME="calm-gtm"
+SKILL_VERSION="v1.1.0"
 REPO_URL="https://github.com/teamdemaa/calm-gtm"
 INSTALLED_ANY=0
+INSTALLED_TARGETS=""
+TOOL_HOME_ROOT="${CALM_GTM_HOME:-$HOME}"
+
+record_target() {
+  target="$1"
+  if [ -z "$INSTALLED_TARGETS" ]; then
+    INSTALLED_TARGETS="$target"
+  else
+    INSTALLED_TARGETS="$INSTALLED_TARGETS,$target"
+  fi
+}
 
 # Resolve where SKILL.md and references/ actually are. If this script is
 # running from inside a local clone (has SKILL.md next to its parent
@@ -33,9 +45,14 @@ if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../SKILL.md" ]; then
 else
   TMP_DIR="$(mktemp -d)"
   trap 'rm -rf "$TMP_DIR"' EXIT
-  echo "Downloading calm-gtm..."
-  curl -fsSL "$REPO_URL/archive/refs/heads/main.tar.gz" | tar -xz -C "$TMP_DIR"
-  SRC_DIR="$TMP_DIR/calm-gtm-main"
+  echo "Downloading calm-gtm $SKILL_VERSION..."
+  curl -fsSL --max-time 30 "$REPO_URL/archive/refs/tags/$SKILL_VERSION.tar.gz" | tar -xz -C "$TMP_DIR"
+  set -- "$TMP_DIR"/*
+  SRC_DIR="$1"
+  if [ ! -d "$SRC_DIR" ] || [ ! -f "$SRC_DIR/SKILL.md" ]; then
+    echo "Downloaded skill archive is invalid."
+    exit 1
+  fi
 fi
 
 install_into() {
@@ -50,17 +67,18 @@ install_into() {
     cp -R "$SRC_DIR/SKILL.md" "$SRC_DIR/references" "$target_dir/"
     echo "Installed for $label -> $target_dir"
     INSTALLED_ANY=1
+    record_target "$3"
   fi
 }
 
 # Claude Code: personal skills folder (all projects, auto-discovered).
-install_into "$HOME/.claude/skills/$SKILL_NAME" "Claude Code"
+install_into "$TOOL_HOME_ROOT/.claude/skills/$SKILL_NAME" "Claude Code" "claude"
 
 # Codex: mirrors the same folder-of-markdown convention, if present on
 # this machine. (Unverified against Codex's current docs -- this is a
 # best-effort guess, not a confirmed path. The AGENTS.md step below is
 # what actually guarantees Codex support regardless.)
-install_into "$HOME/.codex/skills/$SKILL_NAME" "Codex"
+install_into "$TOOL_HOME_ROOT/.codex/skills/$SKILL_NAME" "Codex" "codex"
 
 # Universal path: works for Cursor, Windsurf, Codex, Claude Code, and any
 # other agent that reads AGENTS.md from the project root -- run this from
@@ -88,8 +106,23 @@ else
   echo "Added calm-gtm to $PROJECT_ROOT/AGENTS.md (works with Cursor, Windsurf, Codex, Claude Code, and any agent that reads AGENTS.md)"
 fi
 INSTALLED_ANY=1
+record_target "project"
 
 if [ "$INSTALLED_ANY" = "0" ]; then
   echo "Could not install anywhere -- check permissions on \$HOME and the current directory."
   exit 1
 fi
+
+# A completed-run counter, not a unique-user tracker. This sends only the
+# released skill version and fixed target names. It is deliberately fail-open:
+# telemetry can never make installation fail, and users can opt out entirely.
+if [ "${CALM_GTM_TELEMETRY:-1}" != "0" ]; then
+  targets_json="$(printf '%s' "$INSTALLED_TARGETS" | sed 's/[^,]*/"&"/g')"
+  curl -fsS --max-time 2 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    --data "{\"version\":\"$SKILL_VERSION\",\"targets\":[$targets_json]}" \
+    "https://calmgtm.com/api/install-event" >/dev/null 2>&1 || true
+fi
+
+echo "calm-gtm $SKILL_VERSION installation complete."
