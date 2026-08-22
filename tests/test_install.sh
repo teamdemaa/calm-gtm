@@ -20,7 +20,9 @@ Read .agents/calm-gtm/SKILL.md.
 EOF
 
 CALM_GTM_HOME="$home_root" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$project" --agent none --no-start >"$TEST_DIR/install-1.log" 2>&1
-assert_file "$home_root/.local/share/calm-gtm/releases/v1.2.0/.calm-gtm-manifest"
+assert_file "$home_root/.local/share/calm-gtm/releases/v1.2.1/.calm-gtm-manifest"
+assert_contains "$TEST_DIR/install-1.log" 'Installed portable user skill'
+assert_not_contains "$TEST_DIR/install-1.log" 'Installed Codex user skill'
 [ -L "$home_root/.local/bin/calm" ] || fail "calm CLI link was not installed"
 assert_file "$home_root/.agents/skills/calm-gtm/SKILL.md"
 assert_file "$home_root/.agents/skills/calm-gtm/references/apop-questions.csv"
@@ -63,16 +65,16 @@ pass "divergent project skill is preserved"
 upgrade_source=$TEST_DIR/upgrade-source
 mkdir -p "$upgrade_source"
 cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$upgrade_source/"
-printf '1.2.1\n' >"$upgrade_source/VERSION"
+printf '1.2.2\n' >"$upgrade_source/VERSION"
 printf '\n<!-- upgrade fixture -->\n' >>"$upgrade_source/SKILL.md"
 upgrade_home=$TEST_DIR/upgrade-home
 upgrade_project=$TEST_DIR/upgrade-project
 mkdir -p "$upgrade_home" "$upgrade_project"
 CALM_GTM_HOME="$upgrade_home" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$upgrade_project" --agent none --no-start >/dev/null 2>&1
 CALM_GTM_HOME="$upgrade_home" CALM_GTM_TELEMETRY=0 "$upgrade_source/scripts/install.sh" --project "$upgrade_project" --agent none --no-start >/dev/null 2>&1
-assert_file "$upgrade_home/.local/share/calm-gtm/releases/v1.2.1/.calm-gtm-manifest"
+assert_file "$upgrade_home/.local/share/calm-gtm/releases/v1.2.2/.calm-gtm-manifest"
 assert_contains "$upgrade_project/.agents/skills/calm-gtm/SKILL.md" '<!-- upgrade fixture -->'
-[ "$(readlink "$upgrade_home/.local/share/calm-gtm/current")" = "$upgrade_home/.local/share/calm-gtm/releases/v1.2.1" ] || fail "current release was not upgraded"
+[ "$(readlink "$upgrade_home/.local/share/calm-gtm/current")" = "$upgrade_home/.local/share/calm-gtm/releases/v1.2.2" ] || fail "current release was not upgraded"
 pass "safe version upgrade"
 
 stale_home=$TEST_DIR/stale-home
@@ -94,7 +96,7 @@ changed_home=$TEST_DIR/changed-home
 changed_project=$TEST_DIR/changed-project
 mkdir -p "$changed_home" "$changed_project"
 CALM_GTM_HOME="$changed_home" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$changed_project" --agent none --no-start >/dev/null 2>&1
-printf '\nlocal change\n' >>"$changed_home/.local/share/calm-gtm/releases/v1.2.0/bin/calm"
+printf '\nlocal change\n' >>"$changed_home/.local/share/calm-gtm/releases/v1.2.1/bin/calm"
 if CALM_GTM_HOME="$changed_home" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$changed_project" --agent none --no-start >"$TEST_DIR/release-conflict.log" 2>&1; then
   fail "modified CLI release was silently overwritten"
 fi

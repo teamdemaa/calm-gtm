@@ -1,4 +1,4 @@
-# Calm GTM v1.2.0 — Complete local acceptance report
+# Calm GTM v1.2.1 — Complete local acceptance report
 
 **Acceptance date:** 2026-08-22
 **Scope:** source skill, installer, CLI, local memory, four GTM models, derived
@@ -84,7 +84,7 @@ distribution, or search recommendation.
 |---|---|
 | Golden path | all gates, fixed schemas, 12 questions, max three actions per horizon, separate strategy/plan/asset approvals, evidence discipline |
 | Live semantic conversation | one local Codex forward-test completed intake, material clarification, the exact 12-question APOP strategy, separate strategy and plan approvals, one approved asset, and a weak-signal weekly review without changing APOP |
-| Clean-room installation | installed CLI v1.2.0, installed source skill, canonical questions, project `AGENTS.md` |
+| Clean-room installation | installed CLI v1.2.1, installed portable user and project skills, canonical questions, project `AGENTS.md` |
 | CLI | TTY/non-TTY, Codex/Claude/fallback, intake, status, HTML, ancestor roots |
 | Existing projects | no repeated onboarding, proposed-plan lock, legacy schema preservation |
 | CSV safety | malformed current CSV rejected atomically; last valid tracker preserved |
@@ -92,7 +92,7 @@ distribution, or search recommendation.
 | Weekly | five sections, stable strategy on weak signals, strong-change semantic contract |
 | Installer | fresh install, reinstall, v1.1 migration, upgrade, spaces, conflicts, permissions, network errors |
 | Portability | complete suite on macOS; all applicable tests in an isolated Linux container; the v1.1 Git-archive fixture is skipped there because that image has no Git, while the same migration test passes on macOS; POSIX syntax checked with `sh`, `dash`, and `bash` |
-| Site boundary | lint and a production Next.js Webpack build pass; the v1.1.0 public pin remains unchanged before publication approval |
+| Site boundary | lint and a production Next.js Webpack build pass; the public pin is updated only after the matching immutable tag exists |
 
 Commands:
 

@@ -17,7 +17,7 @@ CALM_GTM_HOME="$HOME_ROOT" CALM_GTM_TELEMETRY=0 \
 
 INSTALLED_CALM=$HOME_ROOT/.local/bin/calm
 [ -L "$INSTALLED_CALM" ] || fail "clean-room CLI link is missing"
-[ "$("$INSTALLED_CALM" version)" = "1.2.0" ] || fail "clean-room CLI version is not 1.2.0"
+[ "$("$INSTALLED_CALM" version)" = "1.2.1" ] || fail "clean-room CLI version is not 1.2.1"
 cmp -s "$REPO_ROOT/SKILL.md" "$PROJECT/.agents/skills/calm-gtm/SKILL.md" || fail "project skill differs from the source package"
 cmp -s "$REPO_ROOT/references/apop-questions.csv" "$PROJECT/.agents/skills/calm-gtm/references/apop-questions.csv" || fail "installed canonical questions drifted"
 assert_contains "$PROJECT/AGENTS.md" 'Read .agents/skills/calm-gtm/SKILL.md'
