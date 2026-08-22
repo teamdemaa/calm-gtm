@@ -8,7 +8,7 @@ set -e
 
 SKILL_NAME=calm-gtm
 REPO_URL=https://github.com/teamdemaa/calm-gtm
-RELEASE_VERSION=v1.2.0
+RELEASE_VERSION=v1.2.1
 HOME_ROOT=${CALM_GTM_HOME:-${HOME:-}}
 PROJECT_ARG=$PWD
 NO_START=0
@@ -296,7 +296,7 @@ install_agents_pointer() {
 }
 
 install_release
-install_skill "$HOME_ROOT/.agents/skills/$SKILL_NAME" "Codex user" codex
+install_skill "$HOME_ROOT/.agents/skills/$SKILL_NAME" "portable user" codex
 install_skill "$PROJECT_ROOT/.agents/skills/$SKILL_NAME" "project" project
 if [ -d "$HOME_ROOT/.claude" ] || command -v claude >/dev/null 2>&1; then
   install_skill "$HOME_ROOT/.claude/skills/$SKILL_NAME" "Claude Code user" claude
