@@ -175,8 +175,15 @@ assert_not_contains "$REPO_ROOT/references/apop-strategy.md" 'Close every strate
 assert_contains "$REPO_ROOT/references/weekly-update.md" 'It always has exactly these five'
 assert_contains "$REPO_ROOT/references/assets.md" 'Use a prompt only when the founder explicitly asks for one'
 assert_contains "$REPO_ROOT/references/assets.md" 'Plan approval alone is never asset approval.'
+assert_contains "$REPO_ROOT/SKILL.md" '`.calm/assets.csv`, any existing asset or manifest relevant to the request'
+assert_contains "$REPO_ROOT/references/assets.md" 'Choose the next unused'
+assert_contains "$REPO_ROOT/references/assets.md" 'preserve every existing row'
 assert_contains "$REPO_ROOT/references/action-plan.md" 'at most three actions in each horizon'
 assert_contains "$REPO_ROOT/references/assets.md" '`Draft`, `Final`, or `Superseded`'
+assert_contains "$REPO_ROOT/SKILL.md" 'Every structured CSV record occupies exactly one physical line.'
+assert_file "$REPO_ROOT/lib/calm/csv.awk"
+assert_file "$REPO_ROOT/lib/calm/csv_validate.awk"
+assert_contains "$REPO_ROOT/scripts/install.sh" "RELEASE_VERSION=$CALM_TAG"
 pass "source skill contracts match the golden schemas"
 
 find "$GOLDEN" -type f -name '*.csv' | LC_ALL=C sort >"$TMP_ROOT/csv-files"

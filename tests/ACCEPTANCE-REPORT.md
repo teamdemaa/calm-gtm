@@ -1,4 +1,4 @@
-# Calm GTM v1.2.1 — Complete local acceptance report
+# Calm GTM — Complete local acceptance report
 
 **Acceptance date:** 2026-08-22
 **Scope:** source skill, installer, CLI, local memory, four GTM models, derived
@@ -84,15 +84,15 @@ distribution, or search recommendation.
 |---|---|
 | Golden path | all gates, fixed schemas, 12 questions, max three actions per horizon, separate strategy/plan/asset approvals, evidence discipline |
 | Live semantic conversation | one local Codex forward-test completed intake, material clarification, the exact 12-question APOP strategy, separate strategy and plan approvals, one approved asset, and a weak-signal weekly review without changing APOP |
-| Clean-room installation | installed CLI v1.2.1, installed portable user and project skills, canonical questions, project `AGENTS.md` |
+| Clean-room installation | installed current CLI version, portable user and project skills, canonical questions, project `AGENTS.md` |
 | CLI | TTY/non-TTY, Codex/Claude/fallback, intake, status, HTML, ancestor roots |
-| Existing projects | no repeated onboarding, proposed-plan lock, legacy schema preservation |
-| CSV safety | malformed current CSV rejected atomically; last valid tracker preserved |
-| Assets | finished text asset, multi-file project asset, `Superseded` lifecycle |
+| Existing projects | no repeated onboarding, proposed-plan lock, asset-index reread before revisions, legacy schema preservation |
+| CSV safety | one shared production parser; quoted commas and quotes supported; multiline physical records rejected atomically; last valid tracker preserved |
+| Assets | finished text asset, multi-file project asset, monotonic IDs, existing-row preservation, `Superseded` lifecycle |
 | Weekly | five sections, stable strategy on weak signals, strong-change semantic contract |
-| Installer | fresh install, reinstall, v1.1 migration, upgrade, spaces, conflicts, permissions, network errors |
+| Installer | fresh install, reinstall, v1.1 migration, upgrade, absolute and relative homes, spaces, conflicts, complete runtime package, legacy-copy warnings, permissions, network errors |
 | Portability | complete suite on macOS; all applicable tests in an isolated Linux container; the v1.1 Git-archive fixture is skipped there because that image has no Git, while the same migration test passes on macOS; POSIX syntax checked with `sh`, `dash`, and `bash` |
-| Site boundary | lint and a production Next.js Webpack build pass; the public pin is updated only after the matching immutable tag exists |
+| Site boundary | route success/502/504 tests, lint, and a production Next.js Webpack build pass; the public pin is updated only after the matching immutable tag exists |
 
 Commands:
 
@@ -100,6 +100,7 @@ Commands:
 sh tests/run.sh
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
 npm run lint # from the site repository
+npm test # from the site repository
 ./node_modules/.bin/next build --webpack # from the site repository
 ```
 

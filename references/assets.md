@@ -8,6 +8,13 @@ Create an asset only when both conditions are true:
 Plan approval alone is never asset approval. A weekly priority or a deliverable
 named in the plan is not asset approval either.
 
+Before proposing a brief or assigning an Asset ID, read
+`.calm/action-plan.md`, `.calm/action-plan.csv`, `.calm/assets.csv` when it
+exists, and any existing asset or manifest for the same deliverable. Confirm
+that the plan is agreed and the linked Action ID exists. Choose the next unused
+Asset ID from the complete index, preserve every existing row, and never infer
+identity or revision history from filenames alone.
+
 Before Calm-originated asset work, show one short conversational brief with the
 linked Action ID, deliverable, purpose, audience, and material scope or target
 paths. Ask the founder to approve or change it. Do not persist this brief as a
