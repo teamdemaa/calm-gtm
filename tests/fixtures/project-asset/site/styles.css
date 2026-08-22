@@ -1,0 +1,33 @@
+:root {
+  color: #17201b;
+  background: #f3f0e8;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 48rem;
+  margin: 10vh auto;
+  padding: 2rem;
+}
+
+.eyebrow,
+.proof {
+  color: #526057;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 0.98;
+}
+
+a {
+  display: inline-block;
+  margin: 1rem 0;
+  padding: 0.8rem 1rem;
+  color: white;
+  background: #17201b;
+}

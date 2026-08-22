@@ -1,83 +1,95 @@
 # Model 2 — Action Plan
 
-Only build this once the founder has explicitly agreed to the strategy in
-`.calm/strategy.md`. Every action plan must derive directly from that
-strategy's APOP — see the action-plan rule in the main SKILL.md.
+Create this output only after `.calm/strategy.md` is explicitly `agreed`.
+Derive every action from one or more exact canonical APOP question IDs.
 
-Write the plan to `.calm/action-plan.md`, replacing the previous version
-(history lives in `.calm/weekly.md` — both its "Strategy changes" notes
-and its priorities-over-time — not in multiple copies of this file).
+The plan has three fixed horizons:
 
-Also write `.calm/action-plan.csv`, replacing the previous version, as a
-plain tracker of the same actions. Use exactly this header row, in this
-order, every time — never rename, reorder, add, or remove columns:
+- `Now`: the next 30 days, concrete and immediately executable;
+- `Next`: days 31–90, clear objectives and deliverables;
+- `Later`: months 4–6, milestones and decision points without fake precision.
 
-```
-Horizon,Objective,Action,Why,Responsible,Due,Deliverable,Success Signal,Status
-```
+Keep the plan calm: use at most three actions in each horizon. The `Now`
+actions are the founder's only immediate priorities; sequence additional work
+into `Next` or `Later` instead of presenting a longer active list.
 
-One row per action. `Horizon` is `Now`, `Next`, or `Later`. This file exists
-so the founder can open it in Sheets or Excel — keep the schema identical
-across every regeneration so it stays usable as a running tracker.
+## Approval state
 
-Don't produce a sprawling six-month task list. Use three horizons, with
-precision decreasing the further out you go:
-
-- **Now — next 30 days.** Very concrete.
-- **Next — days 31–90.** Clear objectives and deliverables.
-- **Later — months 4–6.** Direction, milestones, decision points — not fake
-  precision.
-
-## Output format
-
-For each horizon:
+The first plan is a proposal. Begin `.calm/action-plan.md` with:
 
 ```markdown
-### Objective
-One clear objective for the period.
+<!-- calm:plan-status=proposed -->
+<!-- calm:plan-updated-at=YYYY-MM-DD -->
+<!-- calm:plan-agreed-at= -->
+```
 
-### Why this matters
-One short sentence tying it back to the GTM thesis.
+Ask for agreement in the conversation, not inside the persisted file. Do not
+execute actions or create assets while the plan is proposed.
+
+After explicit agreement, change only the metadata to `plan-status=agreed` and
+set `plan-agreed-at`. Approval alone does not rewrite actions and does not
+authorize generation of any asset.
+
+## Authoritative CSV
+
+`.calm/action-plan.csv` is authoritative for actions and statuses. Use exactly:
+
+```csv
+Action ID,Horizon,Objective,Action,Why,APOP Link,Responsible,Due,Deliverable,Success Signal,Status
+```
+
+Rules:
+
+- IDs use `ACT-001`, `ACT-002`, and so on; they are monotonic, never reused or
+  renumbered.
+- A status change or small wording correction keeps the ID.
+- A materially new action receives a new ID.
+- An abandoned action remains addressable with `Status=Stopped`.
+- `Horizon` is exactly `Now`, `Next`, or `Later`.
+- `APOP Link` contains one or more canonical question IDs separated by `|`.
+- `Status` is exactly `Not started`, `In progress`, `Done`, `Blocked`, or
+  `Stopped`.
+- A numerical `Success Signal` is a threshold used for a later decision, never
+  a claim that the result already exists.
+
+Replacing the current CSV is allowed when rendering the current plan, but do
+not silently discard stopped actions or reuse their IDs. Weekly history records
+prior priorities and strategic decisions.
+
+## Fixed Markdown output
+
+Render `.calm/action-plan.md` from the same row values. Use exactly one section
+for each horizon, in order:
+
+```markdown
+## Now — [period]
+
+### [Localized Objective label]
+
+[Objective, textually identical to the CSV after normalizing line wrapping.]
 
 ### Actions
-```
 
-List actions as a table, one row per action, using exactly these columns,
-in this order, same as `.calm/action-plan.csv`:
-
-```markdown
 | Action | Why | Responsible | Due | Deliverable | Success Signal | Status |
 |---|---|---|---|---|---|---|
+| [exact CSV values] |
+
+## Next — [period]
+
+[Same structure.]
+
+## Later — [period]
+
+[Same structure.]
 ```
 
-- **Action:** What exactly needs to happen.
-- **Why:** Why it matters to the GTM thesis.
-- **Responsible:** Founder / cofounder / marketing / sales / product / named person.
-- **Due:** Specific date or week.
-- **Deliverable:** The tangible output.
-- **Success Signal:** What would indicate real progress or a useful learning.
-- **Status:** Not started / In progress / Done / Blocked.
+The human-readable action fields must match the CSV exactly. Do not append an
+approval call-to-action to the file.
 
-Example row:
+## Assets
 
-| Interview 10 Heads of Product matching the ICP | Validate whether the problem is sufficiently painful and urgent | Founder | Week 2 | 10 completed conversations + notes | At least 5 independently describe the same problem and 2 show willingness to test or pay | Not started |
-
-## The rule
-
-Every action must connect to at least one APOP area (Alignment,
-Positioning, Offer, or Promotion). If it doesn't, question whether it
-belongs in the plan at all — this is how Calm avoids generating busywork.
-
-## Assets inside the plan
-
-When an action requires a deliverable that needs actual copy or a page or a
-campaign (not just a task like "run 10 interviews"), list it as a
-**Deliverable** in the action and then produce it using
-`references/assets.md`. The asset library is generated from execution
-needs surfaced here — never build assets speculatively, ahead of an action
-that needs them.
-
-Example:
-
-> **Action:** Test new positioning with the first 20 target accounts.
-> **Deliverables:** Outreach message v1 + landing page v1.
+An asset may be named only when an agreed action needs it. After the plan is
+agreed, follow `references/assets.md` and wait for the founder to explicitly
+ask for or approve that asset before creating it. Do not create speculative
+landing pages, directories, blogs, newsletters, campaigns, or prompts merely
+because they might be useful later.
