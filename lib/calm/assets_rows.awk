@@ -1,38 +1,3 @@
-function clear_fields(    key) {
-  for (key in field) delete field[key]
-}
-
-function parse_csv(line,    i,ch,nextch,value,n,in_quotes) {
-  clear_fields()
-  sub(/\r$/, "", line)
-  value = ""
-  n = 1
-  in_quotes = 0
-  for (i = 1; i <= length(line); i++) {
-    ch = substr(line, i, 1)
-    nextch = substr(line, i + 1, 1)
-    if (in_quotes) {
-      if (ch == "\"" && nextch == "\"") {
-        value = value "\""
-        i++
-      } else if (ch == "\"") {
-        in_quotes = 0
-      } else {
-        value = value ch
-      }
-    } else if (ch == "\"") {
-      in_quotes = 1
-    } else if (ch == ",") {
-      field[n++] = value
-      value = ""
-    } else {
-      value = value ch
-    }
-  }
-  field[n] = value
-  return n
-}
-
 function render_row(row_index) {
   if (lang == "fr") {
     print "- `" asset_id[row_index] "` — " asset_name[row_index] " — " status[row_index] " — lié à `" action_id[row_index] "`."

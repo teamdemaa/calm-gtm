@@ -130,54 +130,10 @@ calm_intake_is_pending() {
 calm_validate_csv_rows() {
   csv_file=$1
   expected_width=$2
-  awk -v expected_width="$expected_width" '
-    function parse_csv(line,    i,ch,nextch,width,in_quotes,after_quote,value) {
-      sub(/\r$/, "", line)
-      width = 1
-      in_quotes = 0
-      after_quote = 0
-      value = ""
-      for (i = 1; i <= length(line); i++) {
-        ch = substr(line, i, 1)
-        nextch = substr(line, i + 1, 1)
-        if (in_quotes) {
-          if (ch == "\"" && nextch == "\"") {
-            value = value "\""
-            i++
-          } else if (ch == "\"") {
-            in_quotes = 0
-            after_quote = 1
-          } else {
-            value = value ch
-          }
-        } else if (after_quote) {
-          if (ch != ",") return -1
-          width++
-          value = ""
-          after_quote = 0
-        } else if (ch == "\"") {
-          if (value != "") return -1
-          in_quotes = 1
-        } else if (ch == ",") {
-          width++
-          value = ""
-        } else {
-          value = value ch
-        }
-      }
-      if (in_quotes) return -1
-      return width
-    }
-    NR == 1 { next }
-    {
-      width = parse_csv($0)
-      if (width != expected_width) {
-        printf "calm: invalid CSV structure: %s line %d (expected %d columns)\n", FILENAME, NR, expected_width > "/dev/stderr"
-        bad = 1
-      }
-    }
-    END { exit bad }
-  ' "$csv_file"
+  awk -v expected_width="$expected_width" \
+    -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/csv.awk" \
+    -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/csv_validate.awk" \
+    "$csv_file"
 }
 
 calm_validate_current_csv() {

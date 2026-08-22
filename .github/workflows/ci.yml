@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: POSIX shell syntax
+        run: |
+          for file in scripts/install.sh bin/calm lib/calm/*.sh; do
+            sh -n "$file"
+            dash -n "$file"
+            bash -n "$file"
+          done
+      - name: Acceptance suite
+        run: sh tests/run.sh
+      - name: Whitespace check
+        run: git diff --check

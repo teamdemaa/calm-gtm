@@ -128,12 +128,13 @@ Keep this short. It's a checkpoint, not a report.
 
 If `.calm/strategy.md` already exists, this is a continuation, not a fresh
 start. Read the existing files that are present: `.calm/strategy.md`,
-`.calm/action-plan.csv`, `.calm/action-plan.md`, `.calm/sources.md`, and the
-most recent entry in `.calm/weekly.md`. Never restart onboarding. Figure out from
-the founder's message which of the four outputs they're asking for (a
-strategy revision, the next planning cycle, an asset, or a weekly check-in)
-and go straight to the matching reference file. Don't re-ask onboarding
-questions you already have answered in `.calm/`.
+`.calm/action-plan.csv`, `.calm/action-plan.md`, `.calm/sources.md`,
+`.calm/assets.csv`, any existing asset or manifest relevant to the request,
+and the most recent entry in `.calm/weekly.md`. Never restart onboarding.
+Figure out from the founder's message which of the four outputs they're asking
+for (a strategy revision, the next planning cycle, an asset, or a weekly
+check-in) and go straight to the matching reference file. Don't re-ask
+onboarding questions you already have answered in `.calm/`.
 
 If the founder brings a *new* link or material mid-project (a new landing
 page draft, updated LinkedIn, a competitor's site), fetch and read it the
@@ -161,6 +162,10 @@ tokens, the five weekly section titles, and the 12 questions in
 stay in the founder's language. The mechanical CLI currently labels derived
 views in French when French is detected and otherwise in English; it preserves
 the source thesis, actions, evidence, and assets without translation.
+
+Every structured CSV record occupies exactly one physical line. Normalize
+narrative line breaks to spaces inside CSV fields and use standard CSV quoting
+for commas and double quotes. Preserve the full readable narrative in Markdown.
 
 ## Project files
 

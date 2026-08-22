@@ -12,6 +12,16 @@ assert_contains "$TEST_DIR/help.txt" 'asks the first question in the terminal'
 assert_contains "$TEST_DIR/help.txt" 'portable handoff'
 pass "CLI help states the universal terminal and coding-agent handoff contract"
 
+broken_package=$TEST_DIR/broken-package
+mkdir -p "$broken_package"
+cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$broken_package/"
+rm -f "$broken_package/lib/calm/weekly_overview.awk"
+if "$broken_package/bin/calm" help >"$TEST_DIR/broken-package.log" 2>&1; then
+  fail "CLI with a missing runtime renderer unexpectedly started"
+fi
+assert_contains "$TEST_DIR/broken-package.log" 'calm: installation incomplete; lib/calm/weekly_overview.awk is missing.'
+pass "CLI reports an incomplete runtime package before sourcing or rendering"
+
 project=$TEST_DIR/project\ with\ spaces
 mkdir -p "$project"
 printf '%s\n' 'Je construis un SaaS vertical. Tout est encore désordonné.' | "$CALM" init --project "$project" --intake - --agent none --no-start >/dev/null
@@ -147,6 +157,22 @@ for malformed_model in strategy action-plan assets weekly; do
   cmp -s "$TEST_DIR/$malformed_model-overview.before" "$TEST_DIR/$malformed_model-overview.after" || fail "$malformed_model invalid CSV replaced the last valid overview"
 done
 pass "malformed current CSV files fail atomically and preserve the last tracker"
+
+multiline=$TEST_DIR/multiline-csv
+mkdir -p "$multiline"
+cp -R "$REPO_ROOT/tests/golden-path/relaycert/snapshots/06-weekly/.calm" "$multiline/.calm"
+cksum "$multiline/.calm/overview.md" >"$TEST_DIR/multiline-overview.before"
+printf '%s\n' \
+  'Period,Question ID,Area,Question,Answer,State' \
+  '2026-08-22T18:00:00+02:00,AL1,Alignment,Question,"First physical line' \
+  'second physical line",Known' >"$multiline/.calm/strategy.csv"
+if "$CALM" status --project "$multiline" >"$TEST_DIR/multiline-invalid.log" 2>&1; then
+  fail "multiline CSV record unexpectedly rendered"
+fi
+assert_contains "$TEST_DIR/multiline-invalid.log" 'invalid CSV structure'
+cksum "$multiline/.calm/overview.md" >"$TEST_DIR/multiline-overview.after"
+cmp -s "$TEST_DIR/multiline-overview.before" "$TEST_DIR/multiline-overview.after" || fail "multiline CSV replaced the last valid overview"
+pass "CSV records remain one physical line and invalid multiline records fail atomically"
 
 fake_bin=$TEST_DIR/fake-bin
 mkdir -p "$fake_bin"

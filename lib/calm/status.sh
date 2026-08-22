@@ -158,7 +158,10 @@ calm_render_overview() {
     if calm_csv_has_header "$calm_dir/action-plan.csv" 'Action ID,Horizon,Objective,Action,Why,APOP Link,Responsible,Due,Deliverable,Success Signal,Status'; then
       proposed=0
       [ "$plan_state" = proposed ] && proposed=1
-      awk -v lang="$language" -v proposed="$proposed" -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/action_rows.awk" "$calm_dir/action-plan.csv" >>"$temp_file"
+      awk -v lang="$language" -v proposed="$proposed" \
+        -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/csv.awk" \
+        -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/action_rows.awk" \
+        "$calm_dir/action-plan.csv" >>"$temp_file"
     else
       legacy_models="$legacy_models action-plan.csv"
     fi
@@ -166,7 +169,10 @@ calm_render_overview() {
 
   if [ -f "$calm_dir/assets.csv" ]; then
     if calm_csv_has_header "$calm_dir/assets.csv" 'Asset ID,Asset Name,Category,Purpose,Linked Action ID,File,Status'; then
-      awk -v lang="$language" -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/assets_rows.awk" "$calm_dir/assets.csv" >>"$temp_file"
+      awk -v lang="$language" \
+        -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/csv.awk" \
+        -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/assets_rows.awk" \
+        "$calm_dir/assets.csv" >>"$temp_file"
     else
       legacy_models="$legacy_models assets.csv"
     fi
@@ -175,7 +181,10 @@ calm_render_overview() {
   if [ -f "$calm_dir/weekly.csv" ] && [ -f "$calm_dir/action-plan.csv" ]; then
     if calm_csv_has_header "$calm_dir/weekly.csv" 'Date,This Week,What Matters,What We Learned,What Not To Overreact To,APOP Changes,Keep,Change,Stop,Priority Action IDs,One Thing Not To Do' && \
        calm_csv_has_header "$calm_dir/action-plan.csv" 'Action ID,Horizon,Objective,Action,Why,APOP Link,Responsible,Due,Deliverable,Success Signal,Status'; then
-      awk -v lang="$language" -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/weekly_overview.awk" "$calm_dir/action-plan.csv" "$calm_dir/weekly.csv" >>"$temp_file"
+      awk -v lang="$language" \
+        -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/csv.awk" \
+        -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/weekly_overview.awk" \
+        "$calm_dir/action-plan.csv" "$calm_dir/weekly.csv" >>"$temp_file"
     elif ! calm_csv_has_header "$calm_dir/weekly.csv" 'Date,This Week,What Matters,What We Learned,What Not To Overreact To,APOP Changes,Keep,Change,Stop,Priority Action IDs,One Thing Not To Do'; then
       legacy_models="$legacy_models weekly.csv"
     fi

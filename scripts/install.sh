@@ -8,7 +8,7 @@ set -e
 
 SKILL_NAME=calm-gtm
 REPO_URL=https://github.com/teamdemaa/calm-gtm
-RELEASE_VERSION=v1.2.1
+RELEASE_VERSION=v1.2.2
 HOME_ROOT=${CALM_GTM_HOME:-${HOME:-}}
 PROJECT_ARG=$PWD
 NO_START=0
@@ -42,6 +42,10 @@ while [ "$#" -gt 0 ]; do
 done
 case "$AGENT" in auto|codex|claude|none) ;; *) fail "invalid agent: $AGENT" ;; esac
 [ -n "$HOME_ROOT" ] || fail "HOME is not set; set CALM_GTM_HOME to an installation root"
+case "$HOME_ROOT" in
+  /*) ;;
+  *) HOME_ROOT=$(pwd -P)/$HOME_ROOT ;;
+esac
 [ ! -e "$HOME_ROOT" ] || [ -d "$HOME_ROOT" ] || fail "installation root is not a directory: $HOME_ROOT"
 [ -d "$PROJECT_ARG" ] || fail "project directory does not exist: $PROJECT_ARG"
 PROJECT_ROOT=$(CDPATH= cd -- "$PROJECT_ARG" && pwd)
@@ -70,6 +74,11 @@ source_package_is_complete() {
     lib/calm/status.sh \
     lib/calm/init.sh \
     lib/calm/adapter.sh \
+    lib/calm/csv.awk \
+    lib/calm/csv_validate.awk \
+    lib/calm/action_rows.awk \
+    lib/calm/assets_rows.awk \
+    lib/calm/weekly_overview.awk \
     references/apop-questions.csv \
     references/apop-strategy.md \
     references/action-plan.md \
@@ -95,7 +104,7 @@ else
   if ! curl -fsSL --max-time 30 "$REPO_URL/archive/refs/tags/$RELEASE_VERSION.tar.gz" -o "$archive"; then
     fail "download failed; no project or user files were changed"
   fi
-  if ! tar -xzf "$archive" -C "$TMP_DIR"; then fail "downloaded archive is invalid; no project or user files were changed"; fi
+  if ! LC_ALL=C tar -xzf "$archive" -C "$TMP_DIR"; then fail "downloaded archive is invalid; no project or user files were changed"; fi
   SRC_DIR=$(find "$TMP_DIR" -mindepth 1 -maxdepth 1 -type d -name 'calm-gtm-*' | sed -n '1p')
   [ -n "$SRC_DIR" ] && source_package_is_complete "$SRC_DIR" || fail "downloaded release is incomplete; no project or user files were changed"
 fi
@@ -295,13 +304,36 @@ install_agents_pointer() {
   fi
 }
 
+warn_legacy_skill_copies() {
+  for legacy_path in \
+    "$PROJECT_ROOT/.agents/$SKILL_NAME" \
+    "$HOME_ROOT/.codex/skills/$SKILL_NAME"
+  do
+    if [ -d "$legacy_path" ]; then
+      note "Legacy discoverable Calm GTM copy was preserved -> $legacy_path" >&2
+      note "Move it outside agent skill directories to avoid ambiguous skill selection." >&2
+    fi
+  done
+
+  for legacy_path in \
+    "$HOME_ROOT"/.agents/skills/"$SKILL_NAME".backup* \
+    "$HOME_ROOT"/.codex/skills/"$SKILL_NAME".backup*
+  do
+    if [ -d "$legacy_path" ]; then
+      note "Legacy discoverable Calm GTM backup was preserved -> $legacy_path" >&2
+      note "Move it outside agent skill directories to avoid ambiguous skill selection." >&2
+    fi
+  done
+}
+
 install_release
-install_skill "$HOME_ROOT/.agents/skills/$SKILL_NAME" "portable user" codex
+install_skill "$HOME_ROOT/.agents/skills/$SKILL_NAME" "portable user" agents
 install_skill "$PROJECT_ROOT/.agents/skills/$SKILL_NAME" "project" project
 if [ -d "$HOME_ROOT/.claude" ] || command -v claude >/dev/null 2>&1; then
   install_skill "$HOME_ROOT/.claude/skills/$SKILL_NAME" "Claude Code user" claude
 fi
 install_agents_pointer
+warn_legacy_skill_copies
 
 if [ "${CALM_GTM_TELEMETRY:-1}" != 0 ] && [ -n "$INSTALLED_TARGETS" ]; then
   targets_json=$(printf '%s' "$INSTALLED_TARGETS" | sed 's/[^,]*/"&"/g')

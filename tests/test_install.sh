@@ -20,7 +20,7 @@ Read .agents/calm-gtm/SKILL.md.
 EOF
 
 CALM_GTM_HOME="$home_root" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$project" --agent none --no-start >"$TEST_DIR/install-1.log" 2>&1
-assert_file "$home_root/.local/share/calm-gtm/releases/v1.2.1/.calm-gtm-manifest"
+assert_file "$home_root/.local/share/calm-gtm/releases/$CALM_TAG/.calm-gtm-manifest"
 assert_contains "$TEST_DIR/install-1.log" 'Installed portable user skill'
 assert_not_contains "$TEST_DIR/install-1.log" 'Installed Codex user skill'
 [ -L "$home_root/.local/bin/calm" ] || fail "calm CLI link was not installed"
@@ -39,6 +39,43 @@ CALM_GTM_HOME="$home_root" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$project
 assert_count "$project/AGENTS.md" '<!-- BEGIN calm-gtm managed v2 -->' 1
 assert_count "$project/AGENTS.md" '<!-- END calm-gtm managed v2 -->' 1
 pass "virgin install, spaces, legacy migration, reinstall, and AGENTS idempotence"
+
+relative_root=$TEST_DIR/relative-root
+mkdir -p "$relative_root"
+relative_root=$(CDPATH= cd -- "$relative_root" && pwd -P)
+relative_home=$relative_root/relative\ home
+relative_project=$relative_root/project
+mkdir -p "$relative_project"
+(
+  cd "$relative_root"
+  CALM_GTM_HOME='relative home' CALM_GTM_TELEMETRY=0 \
+    "$INSTALLER" --project "$relative_project" --agent none --no-start >"$TEST_DIR/relative-home.log" 2>&1
+)
+[ -L "$relative_home/.local/bin/calm" ] || fail "relative CALM_GTM_HOME did not install the CLI link"
+[ "$("$relative_home/.local/bin/calm" version)" = "$CALM_VERSION" ] || fail "relative CALM_GTM_HOME installed an unusable CLI"
+[ "$(readlink "$relative_home/.local/share/calm-gtm/current")" = "$relative_home/.local/share/calm-gtm/releases/$CALM_TAG" ] || fail "relative CALM_GTM_HOME did not create an absolute current-release link"
+assert_file "$relative_project/.calm/intake.md"
+pass "relative CALM_GTM_HOME is normalized before installation"
+
+discovery_home=$TEST_DIR/discovery-home
+discovery_project=$TEST_DIR/discovery-project
+mkdir -p \
+  "$discovery_home/.codex/skills/calm-gtm" \
+  "$discovery_home/.agents/skills/calm-gtm.backup.known" \
+  "$discovery_project/.agents/calm-gtm"
+printf '%s\n' 'legacy codex copy' >"$discovery_home/.codex/skills/calm-gtm/SKILL.md"
+printf '%s\n' 'legacy backup copy' >"$discovery_home/.agents/skills/calm-gtm.backup.known/SKILL.md"
+printf '%s\n' 'legacy project copy' >"$discovery_project/.agents/calm-gtm/SKILL.md"
+CALM_GTM_HOME="$discovery_home" CALM_GTM_TELEMETRY=0 \
+  "$INSTALLER" --project "$discovery_project" --agent none --no-start >"$TEST_DIR/discovery.log" 2>&1
+assert_contains "$TEST_DIR/discovery.log" 'Legacy discoverable Calm GTM copy was preserved'
+assert_contains "$TEST_DIR/discovery.log" 'Legacy discoverable Calm GTM backup was preserved'
+assert_contains "$TEST_DIR/discovery.log" 'Move it outside agent skill directories to avoid ambiguous skill selection.'
+assert_contains "$discovery_home/.codex/skills/calm-gtm/SKILL.md" 'legacy codex copy'
+assert_contains "$discovery_home/.agents/skills/calm-gtm.backup.known/SKILL.md" 'legacy backup copy'
+assert_contains "$discovery_project/.agents/calm-gtm/SKILL.md" 'legacy project copy'
+assert_file "$discovery_project/.agents/skills/calm-gtm/SKILL.md"
+pass "legacy discoverable skill copies are preserved and reported clearly"
 
 if command -v git >/dev/null 2>&1; then
   legacy_home=$TEST_DIR/legacy-home
@@ -65,17 +102,36 @@ pass "divergent project skill is preserved"
 upgrade_source=$TEST_DIR/upgrade-source
 mkdir -p "$upgrade_source"
 cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$upgrade_source/"
-printf '1.2.2\n' >"$upgrade_source/VERSION"
+printf '%s\n' "$CALM_NEXT_VERSION" >"$upgrade_source/VERSION"
 printf '\n<!-- upgrade fixture -->\n' >>"$upgrade_source/SKILL.md"
 upgrade_home=$TEST_DIR/upgrade-home
 upgrade_project=$TEST_DIR/upgrade-project
 mkdir -p "$upgrade_home" "$upgrade_project"
 CALM_GTM_HOME="$upgrade_home" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$upgrade_project" --agent none --no-start >/dev/null 2>&1
 CALM_GTM_HOME="$upgrade_home" CALM_GTM_TELEMETRY=0 "$upgrade_source/scripts/install.sh" --project "$upgrade_project" --agent none --no-start >/dev/null 2>&1
-assert_file "$upgrade_home/.local/share/calm-gtm/releases/v1.2.2/.calm-gtm-manifest"
+assert_file "$upgrade_home/.local/share/calm-gtm/releases/$CALM_NEXT_TAG/.calm-gtm-manifest"
 assert_contains "$upgrade_project/.agents/skills/calm-gtm/SKILL.md" '<!-- upgrade fixture -->'
-[ "$(readlink "$upgrade_home/.local/share/calm-gtm/current")" = "$upgrade_home/.local/share/calm-gtm/releases/v1.2.2" ] || fail "current release was not upgraded"
+[ "$(readlink "$upgrade_home/.local/share/calm-gtm/current")" = "$upgrade_home/.local/share/calm-gtm/releases/$CALM_NEXT_TAG" ] || fail "current release was not upgraded"
 pass "safe version upgrade"
+
+if command -v git >/dev/null 2>&1 && git -C "$REPO_ROOT" rev-parse -q --verify 'refs/tags/v1.2.1' >/dev/null; then
+  published_source=$TEST_DIR/published-v1.2.1
+  published_home=$TEST_DIR/published-upgrade-home
+  published_project=$TEST_DIR/published-upgrade-project
+  mkdir -p "$published_source" "$published_home" "$published_project"
+  LC_ALL=C git -C "$REPO_ROOT" archive v1.2.1 | LC_ALL=C tar -x -C "$published_source"
+  CALM_GTM_HOME="$published_home" CALM_GTM_TELEMETRY=0 \
+    "$published_source/scripts/install.sh" --project "$published_project" --agent none --no-start >/dev/null 2>&1
+  [ "$("$published_home/.local/bin/calm" version)" = '1.2.1' ] || fail "published upgrade fixture did not install v1.2.1"
+  CALM_GTM_HOME="$published_home" CALM_GTM_TELEMETRY=0 \
+    "$INSTALLER" --project "$published_project" --agent none --no-start >/dev/null 2>&1
+  [ "$("$published_home/.local/bin/calm" version)" = "$CALM_VERSION" ] || fail "published v1.2.1 installation did not upgrade to $CALM_VERSION"
+  assert_file "$published_home/.local/share/calm-gtm/releases/$CALM_TAG/.calm-gtm-manifest"
+  assert_file "$published_project/.agents/skills/calm-gtm/references/apop-questions.csv"
+  pass "published v1.2.1 installation upgrades safely to the current source"
+else
+  printf '%s\n' 'SKIP: published v1.2.1 upgrade fixture requires its Git tag'
+fi
 
 stale_home=$TEST_DIR/stale-home
 stale_project=$TEST_DIR/stale-project
@@ -96,7 +152,7 @@ changed_home=$TEST_DIR/changed-home
 changed_project=$TEST_DIR/changed-project
 mkdir -p "$changed_home" "$changed_project"
 CALM_GTM_HOME="$changed_home" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$changed_project" --agent none --no-start >/dev/null 2>&1
-printf '\nlocal change\n' >>"$changed_home/.local/share/calm-gtm/releases/v1.2.1/bin/calm"
+printf '\nlocal change\n' >>"$changed_home/.local/share/calm-gtm/releases/$CALM_TAG/bin/calm"
 if CALM_GTM_HOME="$changed_home" CALM_GTM_TELEMETRY=0 "$INSTALLER" --project "$changed_project" --agent none --no-start >"$TEST_DIR/release-conflict.log" 2>&1; then
   fail "modified CLI release was silently overwritten"
 fi
@@ -200,7 +256,8 @@ PATH="$telemetry_enabled_bin:/usr/bin:/bin" CALM_TELEMETRY_CAPTURE="$TEST_DIR/te
   CALM_GTM_HOME="$telemetry_enabled_home" \
   "$INSTALLER" --project "$telemetry_enabled_project" --agent none --no-start >/dev/null 2>&1
 assert_contains "$TEST_DIR/telemetry-payload" '"project"'
-assert_contains "$TEST_DIR/telemetry-payload" '"codex"'
+assert_contains "$TEST_DIR/telemetry-payload" '"agents"'
+assert_not_contains "$TEST_DIR/telemetry-payload" '"codex"'
 assert_not_contains "$TEST_DIR/telemetry-payload" '"cli"'
 pass "telemetry targets match the public API contract"
 
@@ -220,6 +277,31 @@ assert_not_file "$partial_project/AGENTS.md"
 assert_not_file "$partial_project/.calm/intake.md"
 [ -z "$(find "$partial_home" -mindepth 1 -print -quit)" ] || fail "incomplete release mutated the installation root"
 pass "incomplete local release fails before user or project mutation"
+
+for missing_runtime in \
+  lib/calm/csv.awk \
+  lib/calm/csv_validate.awk \
+  lib/calm/action_rows.awk \
+  lib/calm/assets_rows.awk \
+  lib/calm/weekly_overview.awk
+do
+  runtime_name=$(printf '%s\n' "$missing_runtime" | tr '/.' '--')
+  runtime_source=$TEST_DIR/runtime-missing-$runtime_name
+  runtime_home=$TEST_DIR/runtime-home-$runtime_name
+  runtime_project=$TEST_DIR/runtime-project-$runtime_name
+  mkdir -p "$runtime_source" "$runtime_home" "$runtime_project"
+  cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$runtime_source/"
+  rm -f "$runtime_source/$missing_runtime"
+  if CALM_GTM_HOME="$runtime_home" CALM_GTM_TELEMETRY=0 \
+    "$runtime_source/scripts/install.sh" --project "$runtime_project" --agent none --no-start >"$TEST_DIR/runtime-$runtime_name.log" 2>&1; then
+    fail "release missing $missing_runtime unexpectedly installed"
+  fi
+  assert_contains "$TEST_DIR/runtime-$runtime_name.log" 'local release package is incomplete; no project or user files were changed'
+  assert_not_file "$runtime_project/AGENTS.md"
+  assert_not_file "$runtime_project/.calm/intake.md"
+  [ -z "$(find "$runtime_home" -mindepth 1 -print -quit)" ] || fail "release missing $missing_runtime mutated the installation root"
+done
+pass "every runtime renderer is required before installation mutates user or project files"
 
 standalone=$TEST_DIR/standalone
 mkdir -p "$standalone/scripts" "$standalone/fake-bin" "$standalone/project" "$standalone/home"

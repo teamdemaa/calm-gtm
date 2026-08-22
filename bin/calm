@@ -20,10 +20,22 @@ CALM_BIN_DIR=$(resolve_script "$0")
 CALM_GTM_PACKAGE_ROOT=$(CDPATH= cd -- "$CALM_BIN_DIR/.." && pwd)
 export CALM_GTM_PACKAGE_ROOT
 
-if [ ! -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/common.sh" ]; then
-  echo "calm: installation incomplete; lib/calm/common.sh is missing." >&2
-  exit 1
-fi
+for calm_required_file in \
+  lib/calm/common.sh \
+  lib/calm/status.sh \
+  lib/calm/adapter.sh \
+  lib/calm/init.sh \
+  lib/calm/csv.awk \
+  lib/calm/csv_validate.awk \
+  lib/calm/action_rows.awk \
+  lib/calm/assets_rows.awk \
+  lib/calm/weekly_overview.awk
+do
+  if [ ! -f "$CALM_GTM_PACKAGE_ROOT/$calm_required_file" ]; then
+    echo "calm: installation incomplete; $calm_required_file is missing." >&2
+    exit 1
+  fi
+done
 
 . "$CALM_GTM_PACKAGE_ROOT/lib/calm/common.sh"
 . "$CALM_GTM_PACKAGE_ROOT/lib/calm/status.sh"
