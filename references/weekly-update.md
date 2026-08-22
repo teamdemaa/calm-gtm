@@ -1,109 +1,92 @@
 # Model 4 — Weekly Update
 
-This is the ongoing operating rhythm and the reason a founder keeps coming
-back. The founder should be able to just say "here's what happened this
-week" — never make them fill out a structured form.
+The founder reports the week naturally. Never make them fill out a form.
+Before responding, read the agreed strategy, authoritative action CSV, current
+plan, latest weekly entry, asset index, and new supplied sources.
 
-Before responding, read `.calm/strategy.md`, `.calm/action-plan.md`, and the
-most recent entry at the top of `.calm/weekly.md` so you know the existing
-strategy, the plan, last week's priorities, and any active experiments.
+Open conversationally by recalling at most three agreed priorities, then ask
+what happened: numbers, conversations, wins, failures, surprises, and anything
+else material.
 
-Open with:
+## Fixed five-section Markdown output
 
-> Last week we agreed on:
-> 1. ...
-> 2. ...
-> 3. ...
->
-> Tell me what happened.
->
-> Give me the numbers, conversations, wins, failures, surprises, or anything
-> else that matters. Write naturally.
-
-If the founder shares a new link (updated site, new LinkedIn post, a
-competitor's page), fetch and read it as part of this update — treat it as
-evidence like anything else they report.
-
-## Output format
-
-Prepend this to the top of `.calm/weekly.md` (most recent first — never
-delete prior entries):
+Prepend the latest entry to `.calm/weekly.md`. It always has exactly these five
+visible sections, even when there is no strategy change:
 
 ```markdown
-## Calm Weekly — [date]
+## Calm Weekly — YYYY-MM-DD
 
-### What happened
-Brief factual recap.
+### 1. This week
 
-### What matters
-Interpret the signal — don't just repeat what the founder said. Identify
-what's actually strategically significant.
+[Factual recap. Attribute founder reports and distinguish them from independently
+verified evidence.]
 
-### What we learned
-The single most important learning.
+### 2. What it means
 
-### What I would not overreact to
-Weak signals, tiny samples, vanity metrics, noise. This is one of Calm's
-most important behaviors — say it even when the founder is excited about a
-result that doesn't actually mean much yet.
+**What matters:** [strategically significant signal]
 
-### Does APOP change?
-Review each area only as needed — most weeks, most areas don't change:
+**What we learned:** [most important learning]
 
-**Alignment:** No change / change.
-**Positioning:** No change / change.
-**Offer:** No change / change.
-**Promotion:** No change / change.
+**What not to overreact to:** [weak signal, tiny sample, vanity metric, or noise]
 
-### Strategy changes
-Only include this section if something above actually changed. For each
-change, in this form:
+### 3. APOP decision
 
-> **[Area] changed this week.**
->
-> Previous hypothesis: "..."
-> New hypothesis: "..."
->
-> Why: [the specific evidence from this week].
+- **Alignment:** No change | [change]
+- **Positioning:** No change | [change]
+- **Offer:** No change | [change]
+- **Promotion:** No change | [change]
+- **Strategy changes:** None | [exact changed question IDs and evidence]
 
-### Keep
-What should continue.
+### 4. Decisions
 
-### Change
-What should be modified.
+**Keep:** [what continues]
 
-### Stop
-What should stop.
+**Change:** [what is modified]
 
-### This week's priorities
-Maximum 3, as a table:
+**Stop:** [what stops]
 
-| Action | Responsible | Due | Success Signal |
-|---|---|---|---|
+### 5. Next week
 
-### One thing not to do
-One distraction or unnecessary activity to explicitly avoid this week.
+| Action ID | This week's step | Responsible | Due | Success Signal |
+|---|---|---|---|---|
+| [at most three existing action IDs] |
+
+**One thing not to do:** [one explicit distraction to avoid]
 ```
 
-Also append one row to `.calm/weekly.csv` (create it with the header row
-below if it doesn't exist yet; never delete prior rows). Use exactly this
-header row, in this order, every time — never rename, reorder, add, or
-remove columns:
+There are no optional visible sections. `Strategy changes` is always present
+and is `None` when no canonical answer or state changes.
 
+## Structured weekly log
+
+Append one row per week to `.calm/weekly.csv` with exactly:
+
+```csv
+Date,This Week,What Matters,What We Learned,What Not To Overreact To,APOP Changes,Keep,Change,Stop,Priority Action IDs,One Thing Not To Do
 ```
-Date,What Happened,What Matters,What We Learned,Keep,Change,Stop,One Thing Not To Do
-```
 
-## Updating the engine
+`APOP Changes` is `None` or a pipe-separated list of exact canonical question
+IDs such as `PO1|PO2|OF3`. `Priority Action IDs` contains at most three existing
+IDs separated by `|`. Markdown and CSV meanings must agree.
 
-The strategy is not immutable, but it's also not rewritten wholesale every
-week. When evidence justifies a change:
+## Evidence threshold
 
-1. Update only the relevant APOP area(s) in `.calm/strategy.md`.
-2. Log what changed and why under "Strategy changes" in this week's
-   `.calm/weekly.md` entry (see the Output format above) — tie every
-   change to specific evidence from this week, not vibes.
-3. Update `.calm/action-plan.md` if future actions are affected.
-4. Update any assets in `.calm/assets/` that depended on what changed.
-5. Never silently rewrite history — prior entries in `.calm/weekly.md`
-   stay visible, even after a decision gets superseded later.
+Most weeks should not change APOP. A reply, one customer result, a status
+change, or a small sample is not enough by itself. Continue the test and record
+what not to overreact to.
+
+When repeated or strong evidence materially changes canonical answers or
+states:
+
+1. update only the affected questions in `strategy.md`;
+2. append one complete 12-row strategy revision with a later unique ISO-8601
+   `Period`;
+3. list only the changed question IDs in `APOP Changes`;
+4. preserve unaffected questions exactly;
+5. record the previous hypothesis, new hypothesis, and exact evidence in this
+   week's APOP decision;
+6. update affected future actions and dependent assets while preserving IDs
+   and history.
+
+Action status changes happen first in `action-plan.csv`, then in the rendered
+plan and derived tracker. A status change is not strategic evidence.

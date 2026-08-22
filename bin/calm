@@ -1,0 +1,69 @@
+#!/usr/bin/env sh
+
+set -e
+
+resolve_script() {
+  script_path=$1
+  while [ -L "$script_path" ]; do
+    script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
+    link_path=$(readlink "$script_path")
+    case "$link_path" in
+      /*) script_path=$link_path ;;
+      *) script_path=$script_dir/$link_path ;;
+    esac
+  done
+  script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
+  printf '%s\n' "$script_dir"
+}
+
+CALM_BIN_DIR=$(resolve_script "$0")
+CALM_GTM_PACKAGE_ROOT=$(CDPATH= cd -- "$CALM_BIN_DIR/.." && pwd)
+export CALM_GTM_PACKAGE_ROOT
+
+if [ ! -f "$CALM_GTM_PACKAGE_ROOT/lib/calm/common.sh" ]; then
+  echo "calm: installation incomplete; lib/calm/common.sh is missing." >&2
+  exit 1
+fi
+
+. "$CALM_GTM_PACKAGE_ROOT/lib/calm/common.sh"
+. "$CALM_GTM_PACKAGE_ROOT/lib/calm/status.sh"
+. "$CALM_GTM_PACKAGE_ROOT/lib/calm/adapter.sh"
+. "$CALM_GTM_PACKAGE_ROOT/lib/calm/init.sh"
+
+calm_usage() {
+  cat <<'EOF'
+Calm GTM local companion
+
+Usage:
+  calm init [--project DIR] [--intake FILE|-] [--agent auto|codex|claude|none] [--no-start]
+  calm status [--project DIR] [--html]
+  calm version
+
+The CLI manages local files, asks the first question in the terminal, and can
+launch a compatible coding-agent CLI. Otherwise it prints a portable handoff.
+GTM reasoning remains in the calm-gtm skill.
+EOF
+}
+
+command_name=${1:-help}
+if [ "$#" -gt 0 ]; then
+  shift
+fi
+
+case "$command_name" in
+  init) calm_init "$@" ;;
+  status) calm_status "$@" ;;
+  version|--version|-V)
+    if [ -f "$CALM_GTM_PACKAGE_ROOT/VERSION" ]; then
+      sed -n '1p' "$CALM_GTM_PACKAGE_ROOT/VERSION"
+    else
+      echo "unknown"
+    fi
+    ;;
+  help|--help|-h) calm_usage ;;
+  *)
+    echo "calm: unknown command: $command_name" >&2
+    calm_usage >&2
+    exit 2
+    ;;
+esac
