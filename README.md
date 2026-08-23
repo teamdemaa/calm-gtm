@@ -33,6 +33,29 @@ curl -fsSL https://calmgtm.com/install | sh -s -- --no-start
 Set `CALM_GTM_HOME` to use an alternate user-home root. Set
 `CALM_GTM_TELEMETRY=0` to disable the fail-open completed-install event.
 
+### Skills and targets
+
+The repository has a multi-skill installer, but `calm-gtm` is the only skill
+installed by default. Once an optional add-on is registered by its own release
+lot, it must be selected explicitly:
+
+```sh
+./scripts/install.sh --skill calm-prospect-ethically --target agents --no-start
+./scripts/install.sh --skill calm-produce-video --target codex --no-start
+./scripts/install.sh --all-skills --target all --no-start
+```
+
+`--skill` and `--target` may each be repeated. Supported targets are the
+portable user and project `.agents` locations, the user `.codex` location, and
+the user `.claude` location. With no target option, the installer preserves the
+existing behavior: it installs `.agents` copies and adds Claude only when
+detected.
+
+Every skill copy has an independent content manifest. An unchanged managed
+copy can be upgraded; a locally modified or unmanaged copy is preserved and
+reported instead of being overwritten. Selecting only an add-on does not
+initialize `.calm/` or start the Calm GTM workflow.
+
 ## First run
 
 Run `calm init` in a terminal. The first question appears there:
@@ -126,6 +149,11 @@ cover state gates, schemas, installation mechanics, and derived views.
 `tests/ACCEPTANCE-REPORT.md` is the human-readable delivery document linking
 the full journey, final `.calm` deliverables, real project-asset fixture, test
 matrix, and remaining publication boundaries.
+
+The packaging and extension boundaries are specified in
+[`docs/multi-skill-foundation.md`](docs/multi-skill-foundation.md). The skill
+allow-list lives in `skills/registry.tsv`; each registered skill owns a fast,
+offline `quick_validate` script, and `scripts/validate-skills.sh` runs them all.
 
 ## Learn more
 

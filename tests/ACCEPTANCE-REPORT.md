@@ -1,8 +1,9 @@
 # Calm GTM — Complete local acceptance report
 
-**Acceptance date:** 2026-08-22
+**Acceptance date:** 2026-08-23
 **Scope:** source skill, installer, CLI, local memory, four GTM models, derived
-tracker, compatibility baseline, and real project assets.
+tracker, compatibility baseline, multi-skill packaging foundation, and real
+project assets.
 **Result:** PASS for the complete deterministic local contract.
 
 ## Product contract verified
@@ -24,6 +25,8 @@ tracker, compatibility baseline, and real project assets.
    fifth source of GTM state.
 9. No account, hosted dashboard, CRM, external sync, database, Notion, or
    Airtable is required by the core.
+10. `calm-gtm` remains the only default skill. Optional add-ons are selected
+    explicitly and cannot initialize or extend the core project model.
 
 ## Reference journey and deliverable documents
 
@@ -90,7 +93,8 @@ distribution, or search recommendation.
 | CSV safety | one shared production parser; quoted commas and quotes supported; multiline physical records rejected atomically; last valid tracker preserved |
 | Assets | finished text asset, multi-file project asset, monotonic IDs, existing-row preservation, `Superseded` lifecycle |
 | Weekly | five sections, stable strategy on weak signals, strong-change semantic contract |
-| Installer | fresh install, reinstall, v1.1 migration, upgrade, absolute and relative homes, spaces, conflicts, complete runtime package, legacy-copy warnings, permissions, network errors |
+| Installer | fresh install, reinstall, v1.1 migration, upgrade, absolute and relative homes, spaces, conflicts, complete runtime package, legacy-copy warnings, permissions, network errors, opt-in add-ons, `.agents` / `.codex` / `.claude` targets, independent manifests, add-on-only isolation, unknown-skill preflight, exact-target symlink refusal |
+| Skill packages | closed registry, matching frontmatter names, per-skill offline `quick_validate`, aggregate validation, core-only default, explicit `--all-skills` |
 | Portability | complete suite on macOS; all applicable tests in an isolated Linux container; the v1.1 Git-archive fixture is skipped there because that image has no Git, while the same migration test passes on macOS; POSIX syntax checked with `sh`, `dash`, and `bash` |
 | Site boundary | route success/502/504 tests, lint, and a production Next.js Webpack build pass; the public pin is updated only after the matching immutable tag exists |
 
@@ -98,7 +102,8 @@ Commands:
 
 ```sh
 sh tests/run.sh
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
+sh scripts/quick_validate.sh
+sh scripts/validate-skills.sh
 npm run lint # from the site repository
 npm test # from the site repository
 ./node_modules/.bin/next build --webpack # from the site repository
