@@ -26,6 +26,9 @@ assert_not_contains "$TEST_DIR/install-1.log" 'Installed Codex user skill'
 [ -L "$home_root/.local/bin/calm" ] || fail "calm CLI link was not installed"
 assert_file "$home_root/.agents/skills/calm-gtm/SKILL.md"
 assert_file "$home_root/.agents/skills/calm-gtm/references/apop-questions.csv"
+assert_file "$home_root/.agents/skills/calm-gtm/scripts/quick_validate.sh"
+[ -x "$home_root/.agents/skills/calm-gtm/scripts/quick_validate.sh" ] || fail "installed core quick validator is not executable"
+"$home_root/.agents/skills/calm-gtm/scripts/quick_validate.sh" >/dev/null
 assert_file "$home_root/.claude/skills/calm-gtm/SKILL.md"
 assert_file "$project/.agents/skills/calm-gtm/SKILL.md"
 assert_file "$project/.agents/skills/calm-gtm/references/apop-questions.csv"
@@ -101,7 +104,7 @@ pass "divergent project skill is preserved"
 
 upgrade_source=$TEST_DIR/upgrade-source
 mkdir -p "$upgrade_source"
-cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$upgrade_source/"
+cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$REPO_ROOT/skills" "$upgrade_source/"
 printf '%s\n' "$CALM_NEXT_VERSION" >"$upgrade_source/VERSION"
 printf '\n<!-- upgrade fixture -->\n' >>"$upgrade_source/SKILL.md"
 upgrade_home=$TEST_DIR/upgrade-home
@@ -290,7 +293,7 @@ do
   runtime_home=$TEST_DIR/runtime-home-$runtime_name
   runtime_project=$TEST_DIR/runtime-project-$runtime_name
   mkdir -p "$runtime_source" "$runtime_home" "$runtime_project"
-  cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$runtime_source/"
+  cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$REPO_ROOT/skills" "$runtime_source/"
   rm -f "$runtime_source/$missing_runtime"
   if CALM_GTM_HOME="$runtime_home" CALM_GTM_TELEMETRY=0 \
     "$runtime_source/scripts/install.sh" --project "$runtime_project" --agent none --no-start >"$TEST_DIR/runtime-$runtime_name.log" 2>&1; then
@@ -302,6 +305,135 @@ do
   [ -z "$(find "$runtime_home" -mindepth 1 -print -quit)" ] || fail "release missing $missing_runtime mutated the installation root"
 done
 pass "every runtime renderer is required before installation mutates user or project files"
+
+multi_source=$TEST_DIR/multi-source
+multi_home=$TEST_DIR/multi-home
+multi_project=$TEST_DIR/multi-project
+mkdir -p "$multi_source" "$multi_home" "$multi_project"
+cp -R "$REPO_ROOT/VERSION" "$REPO_ROOT/SKILL.md" "$REPO_ROOT/bin" "$REPO_ROOT/lib" \
+  "$REPO_ROOT/references" "$REPO_ROOT/scripts" "$REPO_ROOT/migrations" "$REPO_ROOT/skills" "$multi_source/"
+mkdir -p \
+  "$multi_source/skills/example-addon/agents" \
+  "$multi_source/skills/example-addon/assets" \
+  "$multi_source/skills/example-addon/references" \
+  "$multi_source/skills/example-addon/scripts"
+cat >"$multi_source/skills/example-addon/SKILL.md" <<'EOF'
+---
+name: example-addon
+description: Exercise the generic optional skill bundle contract.
+---
+
+# Example add-on
+
+Read only the included example reference.
+EOF
+printf '%s\n' 'interface: example' >"$multi_source/skills/example-addon/agents/openai.yaml"
+printf '%s\n' '{"enabled":false}' >"$multi_source/skills/example-addon/assets/config.json"
+printf '%s\n' '# Example reference' >"$multi_source/skills/example-addon/references/example.md"
+cat >"$multi_source/skills/example-addon/scripts/quick_validate.sh" <<'EOF'
+#!/usr/bin/env sh
+set -e
+skill_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+[ -f "$skill_root/SKILL.md" ]
+[ -f "$skill_root/assets/config.json" ]
+echo "quick_validate example-addon: ok"
+EOF
+chmod +x "$multi_source/skills/example-addon/scripts/quick_validate.sh"
+printf '%s\n' 'example-addon|skills/example-addon|no|bundle|skills/example-addon/scripts/quick_validate.sh' >>"$multi_source/skills/registry.tsv"
+
+CALM_GTM_HOME="$multi_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$multi_project" --target all --no-start >"$TEST_DIR/multi-default.log" 2>&1
+for core_target in \
+  "$multi_home/.agents/skills/calm-gtm" \
+  "$multi_home/.codex/skills/calm-gtm" \
+  "$multi_home/.claude/skills/calm-gtm" \
+  "$multi_project/.agents/skills/calm-gtm"
+do
+  assert_file "$core_target/SKILL.md"
+  assert_file "$core_target/scripts/quick_validate.sh"
+done
+assert_not_file "$multi_home/.agents/skills/example-addon/SKILL.md"
+assert_not_file "$multi_home/.codex/skills/example-addon/SKILL.md"
+assert_not_file "$multi_home/.claude/skills/example-addon/SKILL.md"
+assert_not_file "$multi_project/.agents/skills/example-addon/SKILL.md"
+pass "optional add-ons are not installed by default while every explicit target supports the core"
+
+CALM_GTM_HOME="$multi_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$multi_project" --skill example-addon --target all --no-start >"$TEST_DIR/multi-addon-1.log" 2>&1
+for addon_target in \
+  "$multi_home/.agents/skills/example-addon" \
+  "$multi_home/.codex/skills/example-addon" \
+  "$multi_home/.claude/skills/example-addon" \
+  "$multi_project/.agents/skills/example-addon"
+do
+  assert_file "$addon_target/SKILL.md"
+  assert_file "$addon_target/agents/openai.yaml"
+  assert_file "$addon_target/assets/config.json"
+  assert_file "$addon_target/references/example.md"
+  assert_file "$addon_target/scripts/quick_validate.sh"
+  [ -x "$addon_target/scripts/quick_validate.sh" ] || fail "installed add-on quick validator is not executable: $addon_target"
+  "$addon_target/scripts/quick_validate.sh" >/dev/null
+  assert_file "$addon_target/.calm-skill-manifest"
+done
+assert_count "$multi_project/AGENTS.md" '<!-- BEGIN calm-skill example-addon managed v1 -->' 1
+assert_count "$multi_project/AGENTS.md" '<!-- END calm-skill example-addon managed v1 -->' 1
+
+CALM_GTM_HOME="$multi_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$multi_project" --skill example-addon --target all --no-start >"$TEST_DIR/multi-addon-2.log" 2>&1
+assert_count "$multi_project/AGENTS.md" '<!-- BEGIN calm-skill example-addon managed v1 -->' 1
+printf '%s\n' 'local adaptation' >>"$multi_project/.agents/skills/example-addon/references/example.md"
+CALM_GTM_HOME="$multi_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$multi_project" --skill example-addon --target all --no-start >"$TEST_DIR/multi-addon-conflict.log" 2>&1
+assert_contains "$multi_project/.agents/skills/example-addon/references/example.md" 'local adaptation'
+assert_contains "$TEST_DIR/multi-addon-conflict.log" 'project contains local changes; left unchanged'
+assert_contains "$TEST_DIR/multi-addon-conflict.log" 'Installed Codex user skill example-addon'
+pass "optional add-on installation is complete, idempotent, and preserves a target-local adaptation"
+
+addon_only_home=$TEST_DIR/addon-only-home
+addon_only_project=$TEST_DIR/addon-only-project
+mkdir -p "$addon_only_home" "$addon_only_project"
+CALM_GTM_HOME="$addon_only_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$addon_only_project" --skill example-addon --target codex --no-start >"$TEST_DIR/addon-only.log" 2>&1
+assert_file "$addon_only_home/.codex/skills/example-addon/SKILL.md"
+assert_not_file "$addon_only_home/.agents/skills/calm-gtm/SKILL.md"
+assert_not_file "$addon_only_project/.calm/intake.md"
+assert_not_file "$addon_only_project/AGENTS.md"
+assert_contains "$TEST_DIR/addon-only.log" 'Only optional skills were selected; the Calm GTM project model was not initialized.'
+pass "an add-on-only native install does not initialize or alter the Calm GTM project model"
+
+all_home=$TEST_DIR/all-skills-home
+all_project=$TEST_DIR/all-skills-project
+mkdir -p "$all_home" "$all_project"
+CALM_GTM_HOME="$all_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$all_project" --all-skills --target agents --no-start >"$TEST_DIR/all-skills.log" 2>&1
+assert_file "$all_project/.agents/skills/calm-gtm/SKILL.md"
+assert_file "$all_project/.agents/skills/example-addon/SKILL.md"
+pass "--all-skills explicitly installs both default and optional registry entries"
+
+unknown_home=$TEST_DIR/unknown-skill-home
+unknown_project=$TEST_DIR/unknown-skill-project
+mkdir -p "$unknown_home" "$unknown_project"
+if CALM_GTM_HOME="$unknown_home" CALM_GTM_TELEMETRY=0 \
+  "$multi_source/scripts/install.sh" --project "$unknown_project" --skill not-registered --no-start >"$TEST_DIR/unknown-skill.log" 2>&1; then
+  fail "unknown skill unexpectedly installed"
+fi
+assert_contains "$TEST_DIR/unknown-skill.log" 'unknown skill: not-registered'
+[ -z "$(find "$unknown_home" -mindepth 1 -print -quit)" ] || fail "unknown skill mutated the installation root"
+assert_not_file "$unknown_project/AGENTS.md"
+assert_not_file "$unknown_project/.calm/intake.md"
+pass "unknown skills fail before installation or project mutation"
+
+symlink_skill_home=$TEST_DIR/symlink-skill-home
+symlink_skill_project=$TEST_DIR/symlink-skill-project
+symlink_skill_outside=$TEST_DIR/symlink-skill-outside
+mkdir -p "$symlink_skill_home/.codex/skills" "$symlink_skill_project" "$symlink_skill_outside"
+ln -s "$symlink_skill_outside" "$symlink_skill_home/.codex/skills/calm-gtm"
+CALM_GTM_HOME="$symlink_skill_home" CALM_GTM_TELEMETRY=0 \
+  "$INSTALLER" --project "$symlink_skill_project" --target codex --no-start >"$TEST_DIR/symlink-skill.log" 2>&1
+[ -L "$symlink_skill_home/.codex/skills/calm-gtm" ] || fail "skill target symlink was replaced"
+assert_not_file "$symlink_skill_outside/SKILL.md"
+assert_contains "$TEST_DIR/symlink-skill.log" 'Codex user target is a symlink; left unchanged'
+pass "an exact skill-target symlink is preserved and never followed"
 
 standalone=$TEST_DIR/standalone
 mkdir -p "$standalone/scripts" "$standalone/fake-bin" "$standalone/project" "$standalone/home"
